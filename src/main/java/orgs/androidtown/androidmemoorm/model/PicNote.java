@@ -8,7 +8,7 @@ import com.j256.ormlite.table.DatabaseTable;
  */
 
 @DatabaseTable(tableName = "picnote") //대소문자 지정
-public class PicNote {
+public class PicNote { // 이 클래스의 목적은 데이터를 데이터 베이스와 연결하는 목적!?!
     // 식별자
     @DatabaseField(generatedId = true)
     private long id;

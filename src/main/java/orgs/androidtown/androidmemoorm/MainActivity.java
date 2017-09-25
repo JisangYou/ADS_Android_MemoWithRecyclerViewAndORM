@@ -1,42 +1,83 @@
 package orgs.androidtown.androidmemoorm;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.List;
 
 import orgs.androidtown.androidmemoorm.dao.PicNoteDAO;
 import orgs.androidtown.androidmemoorm.model.PicNote;
+import orgs.androidtown.androidmemoorm.util.PermissionUtil;
 
+/**
+ * RecyclerView 를 사용한 목록 만들기
+ *
+ * 0. 화면만들기
+ *
+ * 1. 데이터를 정의
+ *
+ * 2. 아답터를 재정의
+ *
+ * 3. 재정의한 아답터를 생성하면서 데이터를 담는다
+ *
+ * 4. 아답터와 RecyclerView 컨테이너를 연결
+ *
+ * 5. RecyclerView 에 레이아웃매니저를 성정
+ *
+ */
 public class MainActivity extends AppCompatActivity {
+    CustomAdapter adapter;
 
-    /**
-     * RecyclerView 를 사용한 목록 만들기
-     *
-     * 0. 화면만들기
-     *
-     * 1. 데이터를 정의
-     *
-     * 2. 아답터를 재정의
-     *
-     * 3. 재정의한 아답터를 생성하면서 데이터를 담는다
-     *
-     * 4. 아답터와 RecyclerView 컨테이너를 연결
-     *
-     * 5. RecyclerView 에 레이아웃매니저를 성정
-     *
-     */
+    // 0. 권한 요청코드
+    private static final int REQ_CODE = 999;
+    // 1. 권한 정의
+    private String permissions[] = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
+        if(adapter != null){
+            PicNoteDAO dao = new PicNoteDAO(this);
+            List<PicNote> data = dao.readAll();
+            //* 3. 재정의한 아답터를 생성하면서 데이터를 담는다
+            adapter.setData(data);
+            adapter.notifyDataSetChanged();
+            Toast.makeText(this, "notifyDataSetChanged", Toast.LENGTH_SHORT).show();
 
+        }
+    }
+
+    PermissionUtil pUtil;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        init();
+        pUtil = new PermissionUtil(REQ_CODE, permissions);
+        if(pUtil.checkPermission(this)){
+            init();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(pUtil.afterPermissionResult(requestCode, grantResults)){
+            init();
+        }else{
+            Toast.makeText(this, "승인 하셔야지만 앱을 실행할 수 있습니다.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     /**
@@ -49,17 +90,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init(){
-        PicNoteDAO dao = new PicNoteDAO(this); // this? 의미는? 여기 액티비티의 콘텍스틑 사용한다는 것인가?
-
-        List<PicNote> data = dao.readAll();  // dao클래스의 readAll()메소드를 PicNote타입의 List에 data변수에 답는다.
+        PicNoteDAO dao = new PicNoteDAO(this);
+        //* 1. 데이터를 정의
+        // DB에 테스트 데이터 넣기
+//        for(int i=0; i<1000 ; i++){
+//            PicNote picNote = new PicNote();
+//            picNote.setTitle("안녕하세요 "+i);
+//            picNote.setDatetime(System.currentTimeMillis());
+//            // db 에다가 넣은후
+//            dao.create(picNote);
+//        }
+        // db에서 읽어온다.
+        List<PicNote> data = dao.readAll();
 
         //* 3. 재정의한 아답터를 생성하면서 데이터를 담는다
-        CustomAdapter adapter = new CustomAdapter(); // 아답터 생성
-        adapter.setData(data); // 아답터에 데이터를 뿌려준다.
+         adapter = new CustomAdapter();
+        adapter.setData(data);
         //* 4. 아답터와 RecyclerView 컨테이너를 연결
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recylerView);
-        recyclerView.setAdapter(adapter); // 아답터 장착
-
+        recyclerView.setAdapter(adapter);
         //* 5. RecyclerView 에 레이아웃매니저를 설정
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -78,4 +127,4 @@ public class MainActivity extends AppCompatActivity {
             lm = new GridLayoutManager(this,3);
         */
     }
-    }
+}

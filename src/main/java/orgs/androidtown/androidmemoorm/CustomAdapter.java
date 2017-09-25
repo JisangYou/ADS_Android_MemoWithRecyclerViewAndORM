@@ -1,5 +1,6 @@
 package orgs.androidtown.androidmemoorm;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,10 +19,9 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.Holder>{
     // 1. 데이터 저장소
     private List<PicNote> data;
 
-    public void setData(List<PicNote> data){ //만약에 setData메소드가 호출되고,List<PicNote> data로 들어온 것을
-        this.data = data;// 여기 데이터를 사용해라~라는 의미
+    public void setData(List<PicNote> data){
+        this.data = data;
     }
-
     // 2. 개수
     @Override
     public int getItemCount() { // 목록의 전체 길이를 결정
@@ -42,23 +42,36 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.Holder>{
     @Override
     public void onBindViewHolder(Holder holder, int position) {
         // 1. 데이터저장소에 객체단위로 꺼내둔다
-        PicNote picNote = data.get(position); // 포지션으로 꺼냄
+        PicNote picNote = data.get(position);
         // 2. 홀더에 있는 위젯에 값을 입력한다.
         holder.setTitle(picNote.getTitle());
+        holder.setFilename(picNote.getBitmap());
     }
-
-
-
 
     // 0. 홀더 만들기
     public class Holder extends RecyclerView.ViewHolder{
+        private String filename;
         private TextView textTitle;
+
         public Holder(View itemView) {
             super(itemView);
             textTitle = itemView.findViewById(R.id.textTitle);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(view.getContext(), DetailActivity.class);
+                    intent.putExtra("title", textTitle.getText());
+                    intent.putExtra("filename", filename);
+
+                    view.getContext().startActivity(intent);
+                }
+            });
         }
         public void setTitle(String title){
             textTitle.setText(title);
+        }
+        public void setFilename(String filename){
+            this.filename = filename;
         }
     }
 }

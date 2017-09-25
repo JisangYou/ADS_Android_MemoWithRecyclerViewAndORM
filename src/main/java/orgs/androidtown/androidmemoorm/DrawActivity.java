@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RadioGroup;
 
+import java.io.File;
 import java.io.IOException;
 
 import orgs.androidtown.androidmemoorm.dao.PicNoteDAO;
@@ -21,14 +23,15 @@ public class DrawActivity extends AppCompatActivity {
     RadioGroup radioColor;
     DrawView draw;
     PicNoteDAO dao;
+    EditText editTitle ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_draw);
-
-        init();
         dbInit();
+        init();
+
 
     }
 
@@ -39,7 +42,7 @@ public class DrawActivity extends AppCompatActivity {
     private void init() {
         //라디오 버튼이 선택되면 draw의 paint 색상을 바꿔준다.
         radioColor = (RadioGroup) findViewById(R.id.radioColor);
-
+        editTitle = (EditText) findViewById(R.id.editTitle);
         stage = (FrameLayout) findViewById(R.id.stage);
         draw = new DrawView(this);
         stage.addView(draw);
@@ -73,7 +76,7 @@ public class DrawActivity extends AppCompatActivity {
      * @param view
      */
 
-    public void captureCanvas(View view) {
+    public void captureCanvas(View view) { // 자체 온클릭인가?
 
         //0. 드로잉 캐시를 먼저 지워준다.
         stage.destroyDrawingCache();
@@ -81,21 +84,35 @@ public class DrawActivity extends AppCompatActivity {
         stage.buildDrawingCache();
         //2. 레이아웃에서 그려진 내용을 bitmap형태로 가져온다.
         Bitmap bitmap = stage.getDrawingCache();
+        //이미지 이름을 생성
 
         // 이미지 파일을 저장하고
-        String filename = ""; // null로 초기화?
+        String filename = System.currentTimeMillis()+ ".jpg"; // null로 초기화?
+        // -----------------파일명 중복검사------------------------
+        // 1. 현재 파일명을 풀 경로로 File 객체로 변환
+        String dir = getFilesDir().getAbsolutePath();
+        File file = new File(dir + "/" +filename);
+        int count = 0;
+        while(file.exists()){
+            count++;
+            filename= System.currentTimeMillis()+"("+count+").jpg";
+            file = new File(dir + "/" +filename);
+        }
+        // ------------------------------------------------------------
+
         try {
             // /data/data/패키지/files 밑에....
-            FileUtil.write(this, filename, bitmap); //파일에 bitmap형식으로 들어온 것을 넣는다?
+            FileUtil.write(this, filename, bitmap); //FileUtil에 있는 파라이터가 3개이고 해당하는 타입에 맞게 넣어준것!
         } catch (IOException e) {
             e.printStackTrace();
         }
         //데이터베이스에 경로도 저장하고
         PicNote picNote = new PicNote(); // 왜 여기에는 this가 안들어가지?
         picNote.setBitmap(filename); //비트맵의 경로를 저장
-        picNote.setTitle(filename);
+       picNote.setTitle(editTitle.getText().toString());
+
         picNote.setDatetime(System.currentTimeMillis());
-        dao.create(picNote);
+        dao.create(picNote); //이렇게 저장되어 있는 것을 dao라는 데이터설계 클래스로 통째로 보내준다.
         //제일 중요한 것.....
         bitmap.recycle(); //native에 다 썼다고 알려준다.
 

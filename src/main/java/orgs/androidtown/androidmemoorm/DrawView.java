@@ -56,24 +56,7 @@ public class DrawView extends View {
 
     //화면을 그려주는 onDraw 오버라이드
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
 
-//        // 1. 화면에 터치가 되면.
-//        // 2.연속해서 그림을 그려준다.
-//        //2.1. 터치된 좌표에 작은 동그라미를 그려준다.
-//        if (xs.size()>0 ) {
-//
-//            for (int i = 0; i < xs.size(); i++) {
-//                canvas.drawCircle(xs.get(i), ys.get(i), r, paint);
-//            }
-//        }
-        for (PathTool tool : paths) {
-            paint.setColor(tool.getColor());
-            canvas.drawPath(tool, paint);
-        }
-    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -105,6 +88,24 @@ public class DrawView extends View {
         // 리턴이 false일 경우는 touch 이벤트를 연속해서 발생시키지 않는다.
         // 즉, 드래그를 하면, ontouchEvent가 재 호출되지 않는다.
         return true;
+    }
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+//        // 1. 화면에 터치가 되면.
+//        // 2.연속해서 그림을 그려준다.
+//        //2.1. 터치된 좌표에 작은 동그라미를 그려준다.
+//        if (xs.size()>0 ) {
+//
+//            for (int i = 0; i < xs.size(); i++) {
+//                canvas.drawCircle(xs.get(i), ys.get(i), r, paint);
+//            }
+//        }
+        for (PathTool tool : paths) {
+            paint.setColor(tool.getColor());
+            canvas.drawPath(tool, paint);
+        }
     }
 
 

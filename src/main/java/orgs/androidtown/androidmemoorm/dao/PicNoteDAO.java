@@ -15,14 +15,14 @@ import orgs.androidtown.androidmemoorm.model.PicNote;
  * Created by Jisang on 2017-09-22.
  */
 
-public class PicNoteDAO {
+public class PicNoteDAO { // 이 클래스의 목적은 데이터베이스를 설계!
     DBHelper helper;
     Dao<PicNote, Long> dao = null;
 
     public PicNoteDAO(Context context){ // 이 클래스가 실행이 되면,
         helper = new DBHelper(context); // 헬퍼객체가 생성됨.
         try {
-            dao = helper.getDao(PicNote.class);  //PicNote클래스객체를 헬퍼가 불러와 dao에 담는다.
+            dao = helper.getDao(PicNote.class);  //dao가 PicNote.class를 분석하는 역할
         } catch (SQLException e) {
             e.printStackTrace();
         }
