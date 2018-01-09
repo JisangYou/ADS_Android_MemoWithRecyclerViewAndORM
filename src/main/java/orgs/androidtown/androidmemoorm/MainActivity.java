@@ -16,22 +16,6 @@ import orgs.androidtown.androidmemoorm.dao.PicNoteDAO;
 import orgs.androidtown.androidmemoorm.model.PicNote;
 import orgs.androidtown.androidmemoorm.util.PermissionUtil;
 
-/**
- * RecyclerView 를 사용한 목록 만들기
- *
- * 0. 화면만들기
- *
- * 1. 데이터를 정의
- *
- * 2. 아답터를 재정의
- *
- * 3. 재정의한 아답터를 생성하면서 데이터를 담는다
- *
- * 4. 아답터와 RecyclerView 컨테이너를 연결
- *
- * 5. RecyclerView 에 레이아웃매니저를 성정
- *
- */
 public class MainActivity extends AppCompatActivity {
     CustomAdapter adapter;
 
@@ -104,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         List<PicNote> data = dao.readAll();
 
         //* 3. 재정의한 아답터를 생성하면서 데이터를 담는다
-         adapter = new CustomAdapter();
+        adapter = new CustomAdapter();
         adapter.setData(data);
         //* 4. 아답터와 RecyclerView 컨테이너를 연결
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recylerView);

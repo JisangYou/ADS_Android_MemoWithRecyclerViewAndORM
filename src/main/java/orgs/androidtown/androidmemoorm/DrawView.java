@@ -17,7 +17,7 @@ import java.util.List;
 
 public class DrawView extends View {
     Paint paint;
-    Path currentPath;
+    PathTool currentPath;
 
     List<PathTool> paths = new ArrayList<>();
 
@@ -42,15 +42,18 @@ public class DrawView extends View {
     private void init() {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5F);
-        setColor(Color.BLACK);
+        setColor(Color.BLACK,1);
     }
 
-    public void setColor(int color) {
+    public void setColor(int color, int size) {
 
-        PathTool tool = new PathTool();
-        tool.setColor(color);
+        PathTool tool = new PathTool(color, size);
         currentPath = tool;
         paths.add(tool);
+    }
+
+    public void setSize(int size){
+        setColor(currentPath.getColor(), size);
     }
 
 
@@ -104,6 +107,7 @@ public class DrawView extends View {
 //        }
         for (PathTool tool : paths) {
             paint.setColor(tool.getColor());
+            paint.setStrokeWidth(tool.getSize());
             canvas.drawPath(tool, paint);
         }
     }
@@ -113,8 +117,20 @@ public class DrawView extends View {
 
 class PathTool extends Path {
     private int color;
+    private float size;
 
+    public PathTool(int color, float size) {
+        this.color = color;
+        this.size = size;
+    }
 
+    public float getSize() {
+        return size;
+    }
+
+    public void setSize(float size) {
+        this.size = size;
+    }
 
     public void setColor(int color) {
         this.color = color;
